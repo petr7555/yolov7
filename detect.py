@@ -84,8 +84,7 @@ def detect(save_img=False):
 
         # Inference
         t1 = time_synchronized()
-        with torch.no_grad():   # Calculating gradients would cause a GPU memory leak
-            pred = model(img, augment=opt.augment)[0]
+        pred = model(img, augment=opt.augment)[0]
         t2 = time_synchronized()
 
         # Apply NMS
@@ -120,9 +119,9 @@ def detect(save_img=False):
                 for *xyxy, conf, cls in reversed(det):
                     if save_txt:  # Write to file
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                        line = (cls, *xywh, conf) if opt.save_conf else (cls, *xywh)  # label format
+                        line = (names[int(cls)], *xyxy, conf) if opt.save_conf else (names[int(cls)], *xyxy)  # label format
                         with open(txt_path + '.txt', 'a') as f:
-                            f.write(('%g ' * len(line)).rstrip() % line + '\n')
+                            f.write(('%s,' + '%g,' * (len(line)-1)).rstrip(",") % line + '\n')
 
                     if save_img or view_img:  # Add bbox to image
                         label = f'{names[int(cls)]} {conf:.2f}'
